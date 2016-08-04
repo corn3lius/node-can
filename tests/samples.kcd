@@ -4,7 +4,37 @@
 			<Signal name="SpeedKm" offset="0" length="8" endianess="little">
 				<Value type="signed"/>
 			</Signal>
-		</Message>		
+		</Message>
+		<Message id="0x37E" name="TestMessage">
+			<Signal name="TestSignal_1" offset="0" length="4" >
+				<Value type="signed" />
+			</Signal>
+			<Signal name="TestSignal_2" offset="4" length="8" >
+				<Value type="signed" />
+			</Signal>
+			<Signal name="TestSignal_3" offset="12" length="4" >
+				<Value type="signed" />
+			</Signal>
+
+			<Signal name="TestSignal_4" offset="16" length="8" >
+				<Value type="signed" />
+			</Signal>
+			<Signal name="TestSignal_5" offset="24" length="8" >
+				<Value type="signed" />
+			</Signal>
+			<Signal name="TestSignal_6" offset="32" length="8" >
+				<Value type="signed" />
+			</Signal>
+			<Signal name="TestSignal_7" offset="40" length="8" >
+				<Value type="signed" />
+			</Signal>
+			<Signal name="TestSignal_8" offset="48" length="8" >
+				<Value type="signed" />
+			</Signal>
+			<Signal name="TestSignal_9" offset="56" length="8" >
+				<Value type="signed" />
+			</Signal>
+		</Message>
 	</Bus>
 </NetworkDefinition>
 
