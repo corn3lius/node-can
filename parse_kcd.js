@@ -102,7 +102,7 @@ exports.parseKcdFile = function(file) {
 						if (result.nodes[id])
 						{
 							if (result.nodes[id].buses[bus['name']] == undefined)
-								result.nodes[id].buses[bus['name']] = { produces: [], consume: []}
+								result.nodes[id].buses[bus['name']] = { produces: [], consumes: []}
 							
 							result.nodes[id].buses[bus['name']].produces.push(_m);
 						}
@@ -116,7 +116,7 @@ exports.parseKcdFile = function(file) {
 						if (result.nodes[id])
 						{
 							if (result.nodes[id].buses[bus['name']] == undefined)
-								result.nodes[id].buses[bus['name']] = { produces: [], consume: []}
+								result.nodes[id].buses[bus['name']] = { produces: [], consumes: []}
 							
 							result.nodes[id].buses[bus['name']].consumes.push(_m);
 						}
