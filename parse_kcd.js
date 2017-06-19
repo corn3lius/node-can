@@ -66,7 +66,14 @@ exports.parseKcdFile = function(file) {
 					},				
 			}
 			
-		
+			// J1939AAC="0x1" 
+			// J1939Function="0x42"
+			// J1939IdentityNumber="0x30001" 
+			// J1939IndustryGroup="0x2"
+			// J1939ManufacturerCode="0x97" 
+			// J1939System="0xB" id="0xA0"
+			
+			//console.log("Node : " + node['name'] + " . " + node['id'] )
 		}
 		
 		result.buses = {};
@@ -83,28 +90,30 @@ exports.parseKcdFile = function(file) {
 				var consumers = d['Bus'][b]['Message'][m]['Consumer'];
 				
 				var multiplex = d['Bus'][b]['Message'][m]['Multiplex'];
+				//console.log( "MSG : " + m + "  " + message.name  ) 
 			
 				var _m = {
 					name: message.name,
 					id: parseInt(message.id, 16),
 					ext: message.format == 'extended',
 					triggered: message.triggered == 'true',
-					length: message.length ? parseInt(message.length) : 0,
+					len: message.len ? parseInt(message.len) : 0,
 					interval: message.interval ? parseInt(message.interval) : 0,
 					muxed : (multiplex != undefined ),
 				};
-
+				
 				// Add messages going out and from whom.  
 				for (p in producers) {
 					for (n in producers[p]['NodeRef']) {
 						var id = producers[p]['NodeRef'][n]['$']['id'];
-						
+						//console.log( "p? -- " + id )
 						if (result.nodes[id])
 						{
-							if (result.nodes[id].buses[bus['name']] == undefined)
-								result.nodes[id].buses[bus['name']] = { produces: [], consumes: []}
+							//console.log(" P + " + message.name  );
+							if (result.nodes[id].produces == undefined)
+								result.nodes[id].produces =  [];
 							
-							result.nodes[id].buses[bus['name']].produces.push(_m);
+							result.nodes[id].produces.push(_m.name);
 						}
 					}
 				}
@@ -115,17 +124,16 @@ exports.parseKcdFile = function(file) {
 						
 						if (result.nodes[id])
 						{
-							if (result.nodes[id].buses[bus['name']] == undefined)
-								result.nodes[id].buses[bus['name']] = { produces: [], consumes: []}
+							//console.log(" C + " + message.name  );
+							if (result.nodes[id].consumes == undefined)
+								result.nodes[id].consumes =  [];
 							
-							result.nodes[id].buses[bus['name']].consumes.push(_m);
+							result.nodes[id].consumes.push(_m.name);
 						}
 					}
 				}
 				
-				if (!_m.interval)
-					_m.interval = 0;
-				
+				// add the message to the list. 				
 				new_bus['messages'].push(_m);
 	
 				_m.signals = [];
@@ -143,28 +151,28 @@ exports.parseKcdFile = function(file) {
 							
 							var _s = {
 								name: signal.name,
-								mux : parseInt(muxmsg['count'],16),
-								bitLength: signal.length ? parseInt(signal.length) : 1,
+								mux : parseInt(muxmsg['id'],16),
+								bitLength: signal.len ? parseInt(signal.len) : 1,
 								endianess: signal.endianess ? signal.endianess : 'little',
 								spn : signal.spn,
+								alwaysReport: signal.alwaysReport ? signal.alwaysReport : false,
 								labels : {},
 							};							
 							// add Values from the database 
 							if (Array.isArray(value)) {
-								_s.slope = value[0]['$'].slope ? parseFloat(value[0]['$'].slope) : 1.0;
-								_s.intercept = value[0]['$'].intercept ? parseFloat(value[0]['$'].intercept) : 0.0;
+								_s.scale = value[0]['$'].scale ? parseFloat(value[0]['$'].scale) : 1.0;
+								_s.offset = value[0]['$'].offset ? parseFloat(value[0]['$'].offset) : 0.0;
 								_s.units = value[0]['$'].units ? value[0]['$'].units : "";
 								_s.minValue = value[0]['$'].min ? value[0]['$'].min : undefined;
 								_s.maxValue = value[0]['$'].max ? value[0]['$'].max : undefined;
 								_s.type = value[0]['$'].type ? value[0]['$'].type : "unsigned";
 								_s.defaultValue = value[0]['$'].defaultValue ? parseFloat(value[0]['$'].defaultValue) : 0.0 ;
-							
-								// add label sets from the database. 
-								if( Array.isArray( value[0].LabelSet )){
-									var labels = value[0].LabelSet[0]['Label'];
-									for ( var i =0 ; i <  labels.length; i++  ){
-										_s.labels[labels[i]['$'].value] = labels[i]['$'].name ;
-									}
+							}
+							// add label sets from the database. 
+							if( Array.isArray( value[0].LabelSet )){
+								var labels = value[0].LabelSet[0]['Label'];
+								for ( var i =0 ; i <  labels.length; i++  ){
+									_s.labels[labels[i]['$'].value] = labels[i]['$'].name ;
 								}
 							}
 							
@@ -185,30 +193,32 @@ exports.parseKcdFile = function(file) {
 				for (s in d['Bus'][b]['Message'][m]['Signal']) {
 					var signal = d['Bus'][b]['Message'][m]['Signal'][s]['$'];
 					var value = d['Bus'][b]['Message'][m]['Signal'][s]['Value'];
+
+					//console.log( "SIG : " + s + "  " + signal.name ) 
 					
 					var _s = {
 						name: signal.name,
-						bitLength: signal.length ? parseInt(signal.length) : 1,
+						bitLength: signal.len ? parseInt(signal.len) : 1,
 						endianess: signal.endianess ? signal.endianess : 'little',
 						spn : signal.spn,
+						alwaysReport: signal.alwaysReport ? signal.alwaysReport : false,
 						labels : {},
 					};
 					// add Values from the database 
 					if (Array.isArray(value)) {
-						_s.slope = value[0]['$'].slope ? parseFloat(value[0]['$'].slope) : 1.0;
-						_s.intercept = value[0]['$'].intercept ? parseFloat(value[0]['$'].intercept) : 0.0;
+						_s.scale = value[0]['$'].scale ? parseFloat(value[0]['$'].scale) : 1.0;
+						_s.offset = value[0]['$'].offset ? parseFloat(value[0]['$'].offset) : 0.0;
 						_s.units = value[0]['$'].units ? value[0]['$'].units : "";
 						_s.minValue = value[0]['$'].min ? value[0]['$'].min : undefined;
 						_s.maxValue = value[0]['$'].max ? value[0]['$'].max : undefined;
 						_s.type = value[0]['$'].type ? value[0]['$'].type : "unsigned";
 						_s.defaultValue = value[0]['$'].defaultValue ? parseFloat(value[0]['$'].defaultValue) : 0.0 ;
-					
-						// add label sets from the database. 
-						if( Array.isArray( value[0].LabelSet )){
-							var labels = value[0].LabelSet[0]['Label'];
-							for ( var i =0 ; i <  labels.length; i++  ){
-								_s.labels[labels[i]['$'].value] = labels[i]['$'].name ;
-							}
+					}
+					// add label sets from the database. 
+					if( Array.isArray( value[0].LabelSet )){
+						var labels = value[0].LabelSet[0]['Label'];
+						for ( var i =0 ; i <  labels.length; i++  ){
+							_s.labels[labels[i]['$'].value] = labels[i]['$'].name ;
 						}
 					}
 					var offset_num = parseInt(signal.offset) + _s.bitLength;
@@ -221,10 +231,11 @@ exports.parseKcdFile = function(file) {
 					_m.signals.push(_s);
 				}
 							   				
-				if (!_m.length) {
-					_m.length = parseInt(maxOffset / 8);
+				if (!_m.len) {
+					_m.len = parseInt(maxOffset / 8);
 					if (maxOffset % 8 > 0)
-						_m.length++;
+						_m.len++;
+					//console.log("ERROR in "+ _m.name+ " -  max offset - " + maxOffset + " m.len " + _m.len );
 				}
 			}
 		}

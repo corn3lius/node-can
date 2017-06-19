@@ -1,15 +1,15 @@
 {
-  "name": "socketcan",
+  "name": "can",
   "author": {
     "name": "Sebastian Haas",
     "email": "sebastian@sebastianhaas.info"
   },
   "description": "A SocketCAN abstraction layer for NodeJS.",
-  "version": "2.1.1",
+  "version": "1.2.2",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/sebi2k1/node-can.git"
+    "url": "git://github.com/corn3lius/node-can.git#raven"
   },
   "scripts": {
     "configure": "node-gyp configure",
@@ -19,10 +19,9 @@
     "node-gyp": ">=1.0.0"
   },
   "dependencies": {
-    "nan": "*",
     "xml2js": ">=0.2.0"
   },
-  "main": "socketcan.js",
+  "main": "can.js",
   "os": [
     "linux"
   ]

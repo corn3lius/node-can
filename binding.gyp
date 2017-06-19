@@ -2,17 +2,11 @@
   "targets": [
     {
       "target_name": "can",
-      "sources": [ "src/rawchannel.cc" ],
-	   "include_dirs": [
-        "<!(node -e \"require('nan')\")"
-      ]
+      "sources": [ "src/raw.cc" ]
     },
     {
       "target_name": "can_signals",
-      "sources": [ "src/signals.cc" ],
-	   "include_dirs": [
-        "<!(node -e \"require('nan')\")"
-      ]
+      "sources": [ "src/signals.cc" ]
     }
   ]
 }
